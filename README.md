@@ -23,9 +23,8 @@ Add a cache item:
 import io.iron.ironcache.IronCache;
 import io.iron.ironcache.DefaultIronCache;
 
-IronCache cache = new DefaultIronCache("<token>", "<projectId>");
-cache.setCacheName("<cacheName>");
-cache.delete("<key>");
+IronCache cache = new DefaultIronCache("<token>", "<projectId>", "<cacheName>");
+cache.put("<key>", "<value>");
 ```
 
 Get a cache item:
@@ -36,9 +35,10 @@ import io.iron.ironcache.DefaultIronCache;
 import io.iron.ironcache.CacheItem;
 
 IronCache cache = new DefaultIronCache("<token>", "<projectId>", "<cacheName>");
-cache.put("<key>", "<value>");
+CacheItem item = cache.get("<key>");
 // or
-cache.putItem("<cacheName>", "<key>", "<value>");
+CacheItem item = cache.putItem("<cacheName>", "<key>");
+System.out.println(item.getValue());
 ```
 
 Increment an item in the cache:
