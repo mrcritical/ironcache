@@ -25,6 +25,8 @@ import io.iron.ironcache.DefaultIronCache;
 
 IronCache cache = new DefaultIronCache("<token>", "<projectId>", "<cacheName>");
 cache.put("<key>", "<value>");
+// or using another, non-default cache
+cache.putItem("<cacheName>", "<key>", "<value>");
 ```
 
 Get a cache item:
@@ -36,7 +38,7 @@ import io.iron.ironcache.CacheItem;
 
 IronCache cache = new DefaultIronCache("<token>", "<projectId>", "<cacheName>");
 CacheItem item = cache.get("<key>");
-// or
+// or using another, non-default cache
 CacheItem item = cache.getItem("<cacheName>", "<key>");
 System.out.println(item.getValue());
 ```
@@ -49,7 +51,7 @@ import io.iron.ironcache.DefaultIronCache;
 
 IronCache cache = new DefaultIronCache("<token>", "<projectId>", "<cacheName>");
 cache.increment("<key>", 2);
-// or
+// or using another, non-default cache
 cache.incrementItem("<cacheName>", "<key>", 2);
 ```
 
@@ -61,7 +63,7 @@ import io.iron.ironcache.DefaultIronCache;
 
 IronCache cache = new DefaultIronCache("<token>", "<projectId>", "<cacheName>");
 cache.put("<key>", "<new_value>", false, true);
-// or
+// or using another, non-default cache
 cache.putItem("<cacheName>", "<key>", "<new_value>", false, true);
 ```
 
@@ -73,6 +75,8 @@ import io.iron.ironcache.DefaultIronCache;
 
 IronCache cache = new DefaultIronCache("<token>", "<projectId>", "<cacheName>");
 cache.delete("<key>");
+// or using another, non-default cache
+cache.deleteItem("<cacheName>", "<key>");
 ```
 	
 Get list of available caches:
