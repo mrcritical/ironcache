@@ -35,8 +35,7 @@ import io.iron.ironcache.IronCache;
 import io.iron.ironcache.DefaultIronCache;
 import io.iron.ironcache.CacheItem;
 
-IronCache cache = new DefaultIronCache("<token>", "<projectId>");
-cache.setCacheName("<cacheName>");
+IronCache cache = new DefaultIronCache("<token>", "<projectId>", "<cacheName>");
 cache.put("<key>", "<value>");
 // or
 cache.putItem("<cacheName>", "<key>", "<value>");
@@ -49,8 +48,7 @@ import io.iron.ironcache.IronCache;
 import io.iron.ironcache.DefaultIronCache;
 import io.iron.ironcache.CacheItem;
 
-IronCache cache = new DefaultIronCache("<token>", "<projectId>");
-cache.setCacheName("<cacheName>");
+IronCache cache = new DefaultIronCache("<token>", "<projectId>", "<cacheName>");
 cache.increment("<key>", 2);
 // or
 cache.incrementItem("<cacheName>", "<key>", 2);
@@ -62,8 +60,7 @@ Replace a cache item:
 import io.iron.ironcache.IronCache;
 import io.iron.ironcache.DefaultIronCache;
 
-IronCache cache = new DefaultIronCache("<token>", "<projectId>");
-cache.setCacheName("<cacheName>");
+IronCache cache = new DefaultIronCache("<token>", "<projectId>", "<cacheName>");
 cache.put("<key>", "<new_value>", false, true);
 // or
 cache.putItem("<cacheName>", "<key>", "<new_value>", false, true);
@@ -75,8 +72,7 @@ Delete a cache item:
 import io.iron.ironcache.IronCache;
 import io.iron.ironcache.DefaultIronCache;
 
-IronCache cache = new DefaultIronCache("<token>", "<projectId>");
-cache.setCacheName("<cacheName>");
+IronCache cache = new DefaultIronCache("<token>", "<projectId>", "<cacheName>");
 cache.delete("<key>");
 ```
 	
