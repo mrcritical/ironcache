@@ -129,9 +129,8 @@ public class DefaultIronCacheTest {
 	}
 
 	@Test
-	@Ignore
 	public void testDefaultIronCacheStringString() {
-		fail("Not yet implemented");
+		new DefaultIronCache("test-token", "test-project");
 	}
 
 	@Test

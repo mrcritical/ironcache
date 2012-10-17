@@ -304,7 +304,6 @@ public class DefaultIronCache implements IronCache {
 	 */
 	private DefaultIronCache() {
 		json = configure(new ObjectMapper());
-		apiURL = configure(protocol, host, port, apiVersion, projectId);
 		httpClient = new DefaultHttpClient(new PoolingClientConnectionManager());
 	}
 
