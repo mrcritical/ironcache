@@ -37,7 +37,7 @@ import io.iron.ironcache.CacheItem;
 IronCache cache = new DefaultIronCache("<token>", "<projectId>", "<cacheName>");
 CacheItem item = cache.get("<key>");
 // or
-CacheItem item = cache.putItem("<cacheName>", "<key>");
+CacheItem item = cache.getItem("<cacheName>", "<key>");
 System.out.println(item.getValue());
 ```
 
@@ -46,7 +46,6 @@ Increment an item in the cache:
 ``` java
 import io.iron.ironcache.IronCache;
 import io.iron.ironcache.DefaultIronCache;
-import io.iron.ironcache.CacheItem;
 
 IronCache cache = new DefaultIronCache("<token>", "<projectId>", "<cacheName>");
 cache.increment("<key>", 2);
