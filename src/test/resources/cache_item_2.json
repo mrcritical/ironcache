@@ -1,0 +1,8 @@
+{
+   "cache":"TestCache1",
+   "key":"e0248cb1-a568-4057-bb5f-face234ee3c1",
+   "value":"{\"firstName\":\"John\",\"lastName\":\"Smith\",\"age\":25,\"address\":{\"streetAddress\":\"21 2nd Street\",\"city\":\"New York\",\"state\":\"NY\",\"postalCode\":\"10021\"},\"phoneNumber\":[{\"type\":\"home\",\"number\":\"212 555-1234\"},{\"type\":\"fax\",\"number\":\"646 555-4567\"}]}",
+   "cas":5798521409439793001,
+   "flags":2,
+   "expires":"2013-01-01T00:00:00Z"
+}

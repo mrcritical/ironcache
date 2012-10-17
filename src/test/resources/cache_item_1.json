@@ -1,0 +1,8 @@
+{
+   "cache":"TestCache1",
+   "key":"foo@bar.org",
+   "value":"{\"firstName\": \"Foo\",\"lastName\": \"Bar\",\"emailAddress\": \"foo@bar.org\",\"modified\": \"2012-08-12T08:14:19Z\"}",
+   "cas":5798521409439793000,
+   "flags":0,
+   "expires":"9999-01-01T00:00:00Z"
+}
