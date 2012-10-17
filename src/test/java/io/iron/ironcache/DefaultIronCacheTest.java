@@ -14,6 +14,7 @@ import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -122,91 +123,109 @@ public class DefaultIronCacheTest {
 	}
 
 	@Test
+	@Ignore
 	public void testDefaultIronCacheString() {
 		fail("Not yet implemented");
 	}
 
 	@Test
+	@Ignore
 	public void testDefaultIronCacheStringString() {
 		fail("Not yet implemented");
 	}
 
 	@Test
+	@Ignore
 	public void testDelete() {
 		fail("Not yet implemented");
 	}
 
 	@Test
+	@Ignore
 	public void testDeleteItem() {
 		fail("Not yet implemented");
 	}
 
 	@Test
+	@Ignore
 	public void testGet() {
 		fail("Not yet implemented");
 	}
 
 	@Test
+	@Ignore
 	public void testGetCache() {
 		fail("Not yet implemented");
 	}
 
 	@Test
+	@Ignore
 	public void testGetCaches() {
 		fail("Not yet implemented");
 	}
 
 	@Test
+	@Ignore
 	public void testGetCachesInt() {
 		fail("Not yet implemented");
 	}
 
 	@Test
+	@Ignore
 	public void testGetItem() {
 		fail("Not yet implemented");
 	}
 
 	@Test
+	@Ignore
 	public void testIncrement() {
 		fail("Not yet implemented");
 	}
 
 	@Test
+	@Ignore
 	public void testIncrementItem() {
 		fail("Not yet implemented");
 	}
 
 	@Test
+	@Ignore
 	public void testPutItemStringStringString() {
 		fail("Not yet implemented");
 	}
 
 	@Test
+	@Ignore
 	public void testPutItemStringStringStringBooleanBoolean() {
 		fail("Not yet implemented");
 	}
 
 	@Test
+	@Ignore
 	public void testPutStringString() {
 		fail("Not yet implemented");
 	}
 
 	@Test
+	@Ignore
 	public void testPutStringStringBooleanBoolean() {
 		fail("Not yet implemented");
 	}
 
 	@Test
+	@Ignore
 	public void testRequest() {
 		fail("Not yet implemented");
 	}
 
 	@Test
+	@Ignore
 	public void testSetCacheName() {
 		fail("Not yet implemented");
 	}
 
 	@Test
+	@Ignore
 	public void testSingleRequest() {
 		fail("Not yet implemented");
 	}
