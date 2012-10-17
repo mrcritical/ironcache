@@ -342,13 +342,31 @@ public class DefaultIronCache implements IronCache {
 	 * Configure this cache using the supplied token and project id.
 	 * 
 	 * @param token
+	 *            is your authorization token provided by Iron.io
 	 * @param projectId
+	 *            sets the project that backs this cache
 	 */
 	public DefaultIronCache(final String token, final String projectId) {
 		this();
 		this.token = token;
 		this.projectId = projectId;
 		apiURL = configure(protocol, host, port, apiVersion, projectId);
+	}
+
+	/**
+	 * Configure this cache using the supplied token and project id.
+	 * 
+	 * @param token
+	 *            is your authorization token provided by Iron.io
+	 * @param projectId
+	 *            sets the project that backs this cache
+	 * @param cacheName
+	 *            sets the cache to be used by all calls that do not specify a
+	 *            specify cache
+	 */
+	public DefaultIronCache(final String token, final String projectId, final String cacheName) {
+		this(token, projectId);
+		setCacheName(cacheName);
 	}
 
 	/*
@@ -358,6 +376,7 @@ public class DefaultIronCache implements IronCache {
 	 */
 	@Override
 	public void delete(final String key) throws IOException {
+		checkArgument(cacheName != null, "No cache set.  Must call #setCacheName(String) first.");
 		HttpDelete request = new HttpDelete(apiURL + "caches/" + cacheName + "/items/" + key);
 		request(request);
 	}
@@ -381,6 +400,7 @@ public class DefaultIronCache implements IronCache {
 	 */
 	@Override
 	public CacheItem get(final String key) throws IOException {
+		checkArgument(cacheName != null, "No cache set.  Must call #setCacheName(String) first.");
 		return getItem(cacheName, key);
 	}
 
@@ -534,6 +554,7 @@ public class DefaultIronCache implements IronCache {
 	 */
 	@Override
 	public int increment(final String key, final int amount) throws IOException {
+		checkArgument(cacheName != null, "No cache set.  Must call #setCacheName(String) first.");
 		return incrementItem(cacheName, key, amount);
 	}
 
@@ -557,6 +578,7 @@ public class DefaultIronCache implements IronCache {
 	 */
 	@Override
 	public void put(final String key, final String value) throws IOException {
+		checkArgument(cacheName != null, "No cache set.  Must call #setCacheName(String) first.");
 		putItem(cacheName, key, value);
 	}
 
@@ -568,6 +590,7 @@ public class DefaultIronCache implements IronCache {
 	 */
 	@Override
 	public void put(final String key, final String value, final boolean add, final boolean replace) throws IOException {
+		checkArgument(cacheName != null, "No cache set.  Must call #setCacheName(String) first.");
 		putItem(cacheName, key, value, add, replace);
 	}
 
