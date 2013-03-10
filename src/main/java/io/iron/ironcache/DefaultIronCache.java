@@ -737,7 +737,7 @@ public class DefaultIronCache implements IronCache {
 		request.setHeader("Authorization", "OAuth " + token);
 		request.setHeader("User-Agent", "IronIO Java Client");
 		if (!HttpDelete.class.isAssignableFrom(request.getClass())) {
-			request.setHeader("ContentType", "application/json");
+			request.setHeader("Content-Type", "application/json");
 		}
 		int statusCode = 200;
 		HttpEntity entity = null;
