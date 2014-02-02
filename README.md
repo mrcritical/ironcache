@@ -8,9 +8,9 @@ Maven Dependency
 
 ``` xml
 <dependency>
-  <groupId>io.iron</groupId>
+  <groupId>com.github.mrcritical</groupId>
   <artifactId>ironcache</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>1.0.0-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -20,8 +20,8 @@ Examples
 Add a cache item:
 
 ``` java
-import io.iron.ironcache.IronCache;
-import io.iron.ironcache.DefaultIronCache;
+import com.github.mrcritical.ironcache.IronCache;
+import com.github.mrcritical.ironcache.DefaultIronCache;
 
 IronCache cache = new DefaultIronCache("<token>", "<projectId>", "<cacheName>");
 cache.put("<key>", "<value>");
@@ -32,9 +32,9 @@ cache.putItem("<cacheName>", "<key>", "<value>");
 Get a cache item:
 
 ``` java
-import io.iron.ironcache.IronCache;
-import io.iron.ironcache.DefaultIronCache;
-import io.iron.ironcache.CacheItem;
+import com.github.mrcritical.ironcache.IronCache;
+import com.github.mrcritical.ironcache.DefaultIronCache;
+import com.github.mrcritical.ironcache.CacheItem;
 
 IronCache cache = new DefaultIronCache("<token>", "<projectId>", "<cacheName>");
 CacheItem item = cache.get("<key>");
@@ -46,8 +46,8 @@ System.out.println(item.getValue());
 Increment an item in the cache:
 
 ``` java
-import io.iron.ironcache.IronCache;
-import io.iron.ironcache.DefaultIronCache;
+import com.github.mrcritical.ironcache.IronCache;
+import com.github.mrcritical.ironcache.DefaultIronCache;
 
 IronCache cache = new DefaultIronCache("<token>", "<projectId>", "<cacheName>");
 cache.increment("<key>", 2);
@@ -58,8 +58,8 @@ cache.incrementItem("<cacheName>", "<key>", 2);
 Replace a cache item:
 
 ``` java
-import io.iron.ironcache.IronCache;
-import io.iron.ironcache.DefaultIronCache;
+import com.github.mrcritical.ironcache.IronCache;
+import com.github.mrcritical.ironcache.DefaultIronCache;
 
 IronCache cache = new DefaultIronCache("<token>", "<projectId>", "<cacheName>");
 cache.put("<key>", "<new_value>", false, true);
@@ -70,8 +70,8 @@ cache.putItem("<cacheName>", "<key>", "<new_value>", false, true);
 Delete a cache item:
 
 ``` java
-import io.iron.ironcache.IronCache;
-import io.iron.ironcache.DefaultIronCache;
+import com.github.mrcritical.ironcache.IronCache;
+import com.github.mrcritical.ironcache.DefaultIronCache;
 
 IronCache cache = new DefaultIronCache("<token>", "<projectId>", "<cacheName>");
 cache.delete("<key>");
@@ -82,9 +82,9 @@ cache.deleteItem("<cacheName>", "<key>");
 Get list of available caches:
 
 ``` java
-import io.iron.ironcache.IronCache;
-import io.iron.ironcache.DefaultIronCache;
-import io.iron.ironcache.Cache;
+import com.github.mrcritical.ironcache.IronCache;
+import com.github.mrcritical.ironcache.DefaultIronCache;
+import com.github.mrcritical.ironcache.Cache;
 
 IronCache cache = new DefaultIronCache("<token>", "<projectId>");
 List<Cache> caches = cache.getCaches();
