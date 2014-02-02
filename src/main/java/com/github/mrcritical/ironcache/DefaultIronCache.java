@@ -1,4 +1,4 @@
-package io.iron.ironcache;
+package com.github.mrcritical.ironcache;
 
 import static com.google.common.base.Preconditions.checkArgument;
 

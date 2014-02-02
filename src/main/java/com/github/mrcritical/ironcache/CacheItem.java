@@ -1,4 +1,4 @@
-package io.iron.ironcache;
+package com.github.mrcritical.ironcache;
 
 import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormat;

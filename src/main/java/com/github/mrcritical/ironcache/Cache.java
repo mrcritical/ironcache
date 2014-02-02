@@ -1,7 +1,7 @@
 /**
  * 
  */
-package io.iron.ironcache;
+package com.github.mrcritical.ironcache;
 
 /**
  * @author pjarrell

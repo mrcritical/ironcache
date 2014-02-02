@@ -1,4 +1,4 @@
-package io.iron.ironcache;
+package com.github.mrcritical.ironcache;
 
 import static org.junit.Assert.fail;
 
@@ -18,6 +18,9 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+
+import com.github.mrcritical.ironcache.CacheItem;
+import com.github.mrcritical.ironcache.DefaultIronCache;
 
 public class DefaultIronCacheTest {
 
