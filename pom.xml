@@ -17,7 +17,7 @@
 
 	<scm>
 		<connection>scm:git:git@github.com:mrcritical/ironcache.git</connection>
-		<developerConnection>scm:git:git@github.com:mrcritical/ironcache.gitt</developerConnection>
+		<developerConnection>scm:git:git@github.com:mrcritical/ironcache.git</developerConnection>
 		<url>git@github.com:mrcritical/ironcache.git</url>
 	</scm>
 
