@@ -1,35 +1,33 @@
-package com.github.mrcritical.ironcache;
+package com.github.mrcritical.ironcache.model;
 
 import java.io.IOException;
+
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
 /**
  * @author pjarrell
  *
  */
+@Getter
+@EqualsAndHashCode(callSuper = true)
 public class HTTPException extends IOException {
 
 	private static final long serialVersionUID = -5125419459309848324L;
 
-	private final int status;
+	private final int statusCode;
 
 	/**
 	 * Creates a new HTTPException.
-	 * 
-	 * @param status
+	 *
+	 * @param statusCode
 	 *            The HTTP status code.
 	 * @param message
 	 *            The text of the HTTP status code.
 	 */
-	public HTTPException(final int status, final String message) {
+	public HTTPException(final int statusCode, final String message) {
 		super(message);
-		this.status = status;
-	}
-
-	/**
-	 * Returns the HTTP response's status code.
-	 */
-	public int getStatusCode() {
-		return status;
+		this.statusCode = statusCode;
 	}
 
 }

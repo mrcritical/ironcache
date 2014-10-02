@@ -1,31 +1,25 @@
-package com.github.mrcritical.ironcache.model;
-
-import lombok.Data;
+package com.github.mrcritical.ironcache.internal.model;
 
 import org.joda.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.github.mrcritical.ironcache.CacheItem;
-import com.github.mrcritical.ironcache.serializers.JodaDateTimeSerializer;
+import com.github.mrcritical.ironcache.internal.serializers.JodaLocalDateTimeSerializer;
+import com.github.mrcritical.ironcache.model.CachedItem;
 
 /**
- * Mixin to add Jackson annotations to {@link CacheItem}.
- * 
+ * Mixin to add Jackson annotations to {@link CachedItem}.
+ *
  * @author pjarrell
- * 
+ *
  */
-@Data
 public abstract class CacheItemMixin {
 
 	@JsonCreator
-	CacheItemMixin(@JsonProperty("cache") final String cache,
-			@JsonProperty("cas") final long cas,
-			@JsonProperty("expires") final String expires,
-			@JsonProperty("flags") final int flags,
-			@JsonProperty("key") final String key,
-			@JsonProperty("token") final String token,
+	CacheItemMixin(@JsonProperty("cache") final String cache, @JsonProperty("cas") final long cas,
+			@JsonProperty("expires") final String expires, @JsonProperty("flags") final int flags,
+			@JsonProperty("key") final String key, @JsonProperty("token") final String token,
 			@JsonProperty("value") final String value) {
 
 	}
@@ -37,7 +31,7 @@ public abstract class CacheItemMixin {
 	abstract long getCas();
 
 	@JsonProperty("expires")
-	@JsonSerialize(using = JodaDateTimeSerializer.class)
+	@JsonSerialize(using = JodaLocalDateTimeSerializer.class)
 	abstract LocalDateTime getExpires();
 
 	@JsonProperty("flags")
