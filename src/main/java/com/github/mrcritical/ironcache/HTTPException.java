@@ -2,6 +2,10 @@ package com.github.mrcritical.ironcache;
 
 import java.io.IOException;
 
+/**
+ * @author pjarrell
+ *
+ */
 public class HTTPException extends IOException {
 
 	private static final long serialVersionUID = -5125419459309848324L;

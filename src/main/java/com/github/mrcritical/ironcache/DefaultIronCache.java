@@ -22,205 +22,34 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.PoolingClientConnectionManager;
-import org.codehaus.jackson.JsonGenerator;
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.JsonProcessingException;
-import org.codehaus.jackson.Version;
-import org.codehaus.jackson.annotate.JsonCreator;
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.map.DeserializationContext;
-import org.codehaus.jackson.map.JsonDeserializer;
-import org.codehaus.jackson.map.JsonSerializer;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.SerializerProvider;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
-import org.codehaus.jackson.map.module.SimpleModule;
-import org.codehaus.jackson.type.TypeReference;
-import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
+import org.apache.http.impl.client.HttpClientBuilder;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.Version;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.module.afterburner.AfterburnerModule;
+import com.github.mrcritical.ironcache.model.CacheError;
+import com.github.mrcritical.ironcache.model.CacheItemMixin;
+import com.github.mrcritical.ironcache.model.CacheMixin;
+import com.github.mrcritical.ironcache.model.Increment;
+import com.github.mrcritical.ironcache.model.CacheRequest;
+import com.google.common.io.Resources;
+
+/**
+ * @author pjarrell
+ *
+ */
 public class DefaultIronCache implements IronCache {
-
-	/**
-	 * Mixin to add Jackson annotations to {@link CacheItem}.
-	 * 
-	 * @author pjarrell
-	 * 
-	 */
-	static abstract class CacheItemMixin {
-
-		@JsonCreator
-		CacheItemMixin(@JsonProperty("cache") final String cache, @JsonProperty("cas") final long cas,
-				@JsonProperty("expires") final String expires, @JsonProperty("flags") final int flags,
-				@JsonProperty("key") final String key, @JsonProperty("token") final String token,
-				@JsonProperty("value") final String value) {
-
-		}
-
-		@JsonProperty("cache")
-		abstract String getCache();
-
-		@JsonProperty("cas")
-		abstract long getCas();
-
-		@JsonProperty("expires")
-		@JsonSerialize(using = JodaDateTimeSerializer.class)
-		abstract LocalDateTime getExpires();
-
-		@JsonProperty("flags")
-		abstract int getFlags();
-
-		@JsonProperty("key")
-		abstract String getKey();
-
-		@JsonProperty("token")
-		abstract String getToken();
-
-		@JsonProperty("value")
-		abstract String getValue();
-
-	}
-
-	/**
-	 * Mixin to add Jackson annotations to {@link Cache}.
-	 * 
-	 * @author pjarrell
-	 * 
-	 */
-	static abstract class CacheMixin {
-
-		@JsonCreator
-		CacheMixin(@JsonProperty("id") final String id, @JsonProperty("name") final String name,
-				@JsonProperty("project_id") final String projectId) {
-
-		}
-
-		@JsonProperty("id")
-		abstract String getId();
-
-		@JsonProperty("name")
-		abstract String getName();
-
-		@JsonProperty("project_id")
-		abstract String getProjectId();
-
-	}
-
-	/**
-	 * Object that represents an error response.
-	 * 
-	 * @author pjarrell
-	 * 
-	 */
-	static private class Error {
-
-		@JsonProperty("msg")
-		String msg;
-
-	}
-
-	/**
-	 * Object that represents an increment request.
-	 * 
-	 * @author pjarrell
-	 * 
-	 */
-	static private class Increment {
-
-		@JsonProperty("value")
-		int amount;
-
-		@JsonProperty("msg")
-		String msg;
-
-	}
-
-	/**
-	 * Deserialize a Joda {@link LocalDateTime}.
-	 * 
-	 * @author pjarrell
-	 * 
-	 */
-	static class JodaDateTimeDeserializer extends JsonDeserializer<LocalDateTime> {
-
-		private final DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss'Z'").withZone(
-				DateTimeZone.UTC);
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.codehaus.jackson.map.JsonDeserializer#deserialize(org.codehaus
-		 * .jackson .JsonParser,
-		 * org.codehaus.jackson.map.DeserializationContext)
-		 */
-		@Override
-		public LocalDateTime deserialize(final JsonParser parser, final DeserializationContext context)
-				throws IOException, JsonProcessingException {
-			return formatter.parseLocalDateTime(parser.getText());
-		}
-
-	}
-
-	/**
-	 * Serialize a Joda {@link LocalDateTime}.
-	 * 
-	 * @author pjarrell
-	 * 
-	 */
-	static class JodaDateTimeSerializer extends JsonSerializer<LocalDateTime> {
-
-		private final DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss'Z'").withZone(
-				DateTimeZone.UTC);
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.codehaus.jackson.map.JsonSerializer#serialize(java.lang.Object,
-		 * org.codehaus.jackson.JsonGenerator,
-		 * org.codehaus.jackson.map.SerializerProvider)
-		 */
-		@Override
-		public void serialize(final LocalDateTime value, final JsonGenerator jgen, final SerializerProvider provider)
-				throws IOException, JsonProcessingException {
-			jgen.writeString(value.toString(formatter));
-		}
-
-	}
-
-	/**
-	 * Object that represents a request to be sent to IronCache.
-	 * 
-	 * @author pjarrell
-	 * 
-	 */
-	private class Request {
-
-		@JsonProperty("add")
-		boolean add;
-
-		@JsonProperty("expires_in")
-		String expires;
-
-		@JsonProperty("replace")
-		boolean replace;
-
-		@JsonProperty("value")
-		String value;
-
-	}
 
 	private static final String API_VERSION_KEY = "api_version";
 
 	private static final String CACHE_NAME_KEY = "cache_name";
 
 	private static final String HOST_KEY = "host";
+
+	private static HttpClient httpClient;
 
 	private static final Log logger = LogFactory.getLog(DefaultIronCache.class);
 
@@ -234,6 +63,10 @@ public class DefaultIronCache implements IronCache {
 
 	private static final String TOKEN_KEY = "token";
 
+	static {
+		httpClient = HttpClientBuilder.create().build();
+	}
+
 	/**
 	 * Add mixins to the {@link ObjectMapper} so Jackson can
 	 * serialize/deserialize cache objects.
@@ -242,13 +75,28 @@ public class DefaultIronCache implements IronCache {
 	 *            is the {@link ObjectMapper} to augment
 	 */
 	protected static ObjectMapper configure(final ObjectMapper json) {
-		json.registerModule(new SimpleModule("CacheMixins", new Version(1, 0, 0, null)) {
+		json.registerModule(new SimpleModule("CacheMixins", Version
+				.unknownVersion()) {
+
+			private static final long serialVersionUID = -9123382158943564183L;
+
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see
+			 * com.fasterxml.jackson.databind.module.SimpleModule#setupModule
+			 * (com.fasterxml.jackson.databind.Module.SetupContext)
+			 */
 			@Override
 			public void setupModule(final SetupContext context) {
-				context.setMixInAnnotations(CacheItem.class, CacheItemMixin.class);
+				context.setMixInAnnotations(CacheItem.class,
+						CacheItemMixin.class);
 				context.setMixInAnnotations(Cache.class, CacheMixin.class);
 			}
+
 		});
+		// Increase performance even more
+		json.registerModule(new AfterburnerModule());
 		return json;
 	}
 
@@ -261,14 +109,26 @@ public class DefaultIronCache implements IronCache {
 	 * @param apiVersion
 	 * @param projectId
 	 */
-	protected static String configure(final String protocol, final String host, final int port, final int apiVersion,
-			final String projectId) {
+	protected static String configure(final String protocol, final String host,
+			final int port, final int apiVersion, final String projectId) {
 		checkArgument(protocol != null);
 		checkArgument(host != null);
 		checkArgument(port > 0);
 		checkArgument(apiVersion > 0);
 		checkArgument(projectId != null);
-		return protocol + "://" + host + ":" + port + "/" + apiVersion + "/projects/" + projectId + "/";
+		return protocol + "://" + host + ":" + port + "/" + apiVersion
+				+ "/projects/" + projectId + "/";
+	}
+
+	/**
+	 * Change the shared HTTP client. This changes the HTTP client used by all
+	 * instances of {@link DefaultIronCache}.
+	 * 
+	 * @param httpClient
+	 *            the httpClient to set
+	 */
+	public static void setHttpClient(HttpClient httpClient) {
+		DefaultIronCache.httpClient = httpClient;
 	}
 
 	private String apiURL;
@@ -279,11 +139,9 @@ public class DefaultIronCache implements IronCache {
 
 	private final String clientName = "iron_cache_java";
 
-	private final String clientVersion = "0.0.1";
+	private final String clientVersion = "1.0.1";
 
 	private String host = "cache-aws-us-east-1.iron.io";
-
-	private HttpClient httpClient;
 
 	private final ObjectMapper json;
 
@@ -304,7 +162,6 @@ public class DefaultIronCache implements IronCache {
 	 */
 	private DefaultIronCache() {
 		json = configure(new ObjectMapper());
-		httpClient = new DefaultHttpClient(new PoolingClientConnectionManager());
 	}
 
 	/**
@@ -312,13 +169,19 @@ public class DefaultIronCache implements IronCache {
 	 * classpath).
 	 * 
 	 * @param configurationFile
+	 *            is the classpath relative url to the configuration file
+	 * @throws IOException
 	 */
 	public DefaultIronCache(final String configurationFile) {
 		this();
 
-		InputStream is = this.getClass().getClassLoader().getResourceAsStream(configurationFile);
-		if (is == null) {
-			logger.warn("Failed to locate the configuration file [" + configurationFile + "], using defaults instead");
+		InputStream is = null;
+		try {
+			is = Resources.getResource(DefaultIronCache.class,
+					configurationFile).openStream();
+		} catch (IOException e) {
+			logger.warn("Failed to locate the configuration file ["
+					+ configurationFile + "], using defaults instead");
 			return;
 		}
 		Properties properties = new Properties();
@@ -326,11 +189,13 @@ public class DefaultIronCache implements IronCache {
 			properties.load(is);
 			token = properties.getProperty(TOKEN_KEY, token);
 			projectId = properties.getProperty(PROJECT_ID_KEY, projectId);
-			port = Integer.valueOf(properties.getProperty(PORT_KEY, Integer.toString(port)));
+			port = Integer.valueOf(properties.getProperty(PORT_KEY,
+					Integer.toString(port)));
 			host = properties.getProperty(HOST_KEY, host);
 			cacheName = properties.getProperty(CACHE_NAME_KEY);
 			protocol = properties.getProperty(PROTOCOL_KEY, protocol);
-			apiVersion = Integer.valueOf(properties.getProperty(API_VERSION_KEY, Integer.toString(apiVersion)));
+			apiVersion = Integer.valueOf(properties.getProperty(
+					API_VERSION_KEY, Integer.toString(apiVersion)));
 
 		} catch (IOException e) {
 			logger.error("Failed to read properties, using defaults", e);
@@ -364,7 +229,8 @@ public class DefaultIronCache implements IronCache {
 	 *            sets the cache to be used by all calls that do not specify a
 	 *            specify cache
 	 */
-	public DefaultIronCache(final String token, final String projectId, final String cacheName) {
+	public DefaultIronCache(final String token, final String projectId,
+			final String cacheName) {
 		this(token, projectId);
 		setCacheName(cacheName);
 	}
@@ -376,8 +242,10 @@ public class DefaultIronCache implements IronCache {
 	 */
 	@Override
 	public void delete(final String key) throws IOException {
-		checkArgument(cacheName != null, "No cache set.  Must call #setCacheName(String) first.");
-		HttpDelete request = new HttpDelete(apiURL + "caches/" + cacheName + "/items/" + key);
+		checkArgument(cacheName != null,
+				"No cache set.  Must call #setCacheName(String) first.");
+		HttpDelete request = new HttpDelete(apiURL + "caches/" + cacheName
+				+ "/items/" + key);
 		request(request);
 	}
 
@@ -388,8 +256,10 @@ public class DefaultIronCache implements IronCache {
 	 * java.lang.String)
 	 */
 	@Override
-	public void deleteItem(final String cacheName, final String key) throws IOException {
-		HttpDelete request = new HttpDelete(apiURL + "caches/" + cacheName + "/items/" + key);
+	public void deleteItem(final String cacheName, final String key)
+			throws IOException {
+		HttpDelete request = new HttpDelete(apiURL + "caches/" + cacheName
+				+ "/items/" + key);
 		request(request);
 	}
 
@@ -400,7 +270,8 @@ public class DefaultIronCache implements IronCache {
 	 */
 	@Override
 	public CacheItem get(final String key) throws IOException {
-		checkArgument(cacheName != null, "No cache set.  Must call #setCacheName(String) first.");
+		checkArgument(cacheName != null,
+				"No cache set.  Must call #setCacheName(String) first.");
 		return getItem(cacheName, key);
 	}
 
@@ -449,8 +320,9 @@ public class DefaultIronCache implements IronCache {
 	@Override
 	public List<Cache> getCaches() throws IOException {
 		HttpGet request = new HttpGet(apiURL + "caches");
-		return json.readValue(request(request), new TypeReference<List<Cache>>() {
-		});
+		return json.readValue(request(request),
+				new TypeReference<List<Cache>>() {
+				});
 	}
 
 	/*
@@ -461,8 +333,9 @@ public class DefaultIronCache implements IronCache {
 	@Override
 	public List<Cache> getCaches(final int page) throws IOException {
 		HttpGet request = new HttpGet(apiURL + "caches?page=" + page);
-		return json.readValue(request(request), new TypeReference<List<Cache>>() {
-		});
+		return json.readValue(request(request),
+				new TypeReference<List<Cache>>() {
+				});
 	}
 
 	/**
@@ -500,8 +373,10 @@ public class DefaultIronCache implements IronCache {
 	 * java.lang.String)
 	 */
 	@Override
-	public CacheItem getItem(final String cacheName, final String key) throws IOException {
-		HttpGet request = new HttpGet(apiURL + "caches/" + cacheName + "/items/" + key);
+	public CacheItem getItem(final String cacheName, final String key)
+			throws IOException {
+		HttpGet request = new HttpGet(apiURL + "caches/" + cacheName
+				+ "/items/" + key);
 		return json.readValue(request(request), CacheItem.class);
 	}
 
@@ -554,7 +429,8 @@ public class DefaultIronCache implements IronCache {
 	 */
 	@Override
 	public int increment(final String key, final int amount) throws IOException {
-		checkArgument(cacheName != null, "No cache set.  Must call #setCacheName(String) first.");
+		checkArgument(cacheName != null,
+				"No cache set.  Must call #setCacheName(String) first.");
 		return incrementItem(cacheName, key, amount);
 	}
 
@@ -565,10 +441,11 @@ public class DefaultIronCache implements IronCache {
 	 * java.lang.String, int)
 	 */
 	@Override
-	public int incrementItem(final String cacheName, final String key, final int amount) throws IOException {
-		HttpPost request = new HttpPost(apiURL + "caches/" + cacheName + "/items/" + key + "/increment?amount="
-				+ amount);
-		return json.readValue(request(request), Increment.class).amount;
+	public int incrementItem(final String cacheName, final String key,
+			final int amount) throws IOException {
+		HttpPost request = new HttpPost(apiURL + "caches/" + cacheName
+				+ "/items/" + key + "/increment?amount=" + amount);
+		return json.readValue(request(request), Increment.class).getAmount();
 	}
 
 	/*
@@ -578,7 +455,8 @@ public class DefaultIronCache implements IronCache {
 	 */
 	@Override
 	public void put(final String key, final String value) throws IOException {
-		checkArgument(cacheName != null, "No cache set.  Must call #setCacheName(String) first.");
+		checkArgument(cacheName != null,
+				"No cache set.  Must call #setCacheName(String) first.");
 		putItem(cacheName, key, value);
 	}
 
@@ -589,8 +467,10 @@ public class DefaultIronCache implements IronCache {
 	 * boolean, boolean)
 	 */
 	@Override
-	public void put(final String key, final String value, final boolean add, final boolean replace) throws IOException {
-		checkArgument(cacheName != null, "No cache set.  Must call #setCacheName(String) first.");
+	public void put(final String key, final String value, final boolean add,
+			final boolean replace) throws IOException {
+		checkArgument(cacheName != null,
+				"No cache set.  Must call #setCacheName(String) first.");
 		putItem(cacheName, key, value, add, replace);
 	}
 
@@ -601,7 +481,8 @@ public class DefaultIronCache implements IronCache {
 	 * java.lang.String, java.lang.String)
 	 */
 	@Override
-	public void putItem(final String cacheName, final String key, final String value) throws IOException {
+	public void putItem(final String cacheName, final String key,
+			final String value) throws IOException {
 		putItem(cacheName, key, value, false, false);
 	}
 
@@ -612,15 +493,13 @@ public class DefaultIronCache implements IronCache {
 	 * java.lang.String, java.lang.String, boolean, boolean)
 	 */
 	@Override
-	public void putItem(final String cacheName, final String key, final String value, final boolean add,
-			final boolean replace) throws IOException {
-		HttpPut request = new HttpPut(apiURL + "caches/" + cacheName + "/items/" + key);
-		Request req = new Request();
-		req.value = value;
-		req.add = add;
-		req.replace = replace;
-		StringEntity entity = new StringEntity(json.writeValueAsString(req));
-		request.setEntity(entity);
+	public void putItem(final String cacheName, final String key,
+			final String value, final boolean add, final boolean replace)
+			throws IOException {
+		HttpPut request = new HttpPut(apiURL + "caches/" + cacheName
+				+ "/items/" + key);
+		CacheRequest cacheRequest = new CacheRequest().value(value).add(add).replace(replace);
+		request.setEntity(new StringEntity(json.writeValueAsString(cacheRequest)));
 		request(request);
 	}
 
@@ -681,14 +560,6 @@ public class DefaultIronCache implements IronCache {
 	}
 
 	/**
-	 * @param httpClient
-	 *            the httpClient to set
-	 */
-	public void setHttpClient(final HttpClient httpClient) {
-		this.httpClient = httpClient;
-	}
-
-	/**
 	 * @param json
 	 *            the json to set
 	 */
@@ -728,55 +599,54 @@ public class DefaultIronCache implements IronCache {
 		this.token = token;
 	}
 
-	/**
-	 * @param request
-	 * @return
-	 * @throws IOException
-	 */
-	protected Reader singleRequest(final HttpUriRequest request) throws IOException {
+	protected Reader singleRequest(final HttpUriRequest request)
+			throws IOException {
 		request.setHeader("Authorization", "OAuth " + token);
 		request.setHeader("User-Agent", "IronIO Java Client");
 		if (!HttpDelete.class.isAssignableFrom(request.getClass())) {
-			request.setHeader("Content-Type", "application/json");
+			request.setHeader("Content-Type", "application/json; charset=UTF-8");
 		}
 		int statusCode = 200;
 		HttpEntity entity = null;
-		long start = 0;
-		long now = 0;
+		String encoding = "UTF-8";
 		try {
-			start = System.currentTimeMillis();
+			long start = System.currentTimeMillis();
 			HttpResponse response = httpClient.execute(request);
-			now = System.currentTimeMillis();
-			logger.trace("Request to [" + request.getURI() + "] took " + (now - start) + "ms");
+			logger.trace(String.format("Request to [%s] took %dms",
+					request.getURI(), (System.currentTimeMillis() - start)));
 			statusCode = response.getStatusLine().getStatusCode();
 			entity = response.getEntity();
+			if (null != entity.getContentEncoding()) {
+				encoding = entity.getContentEncoding().getValue();
+			}
+
 		} catch (ClientProtocolException e) {
 			throw new IOException(e);
 		}
-		if (statusCode != 200) {
-			String msg;
-			if (entity != null) {
-				if (entity.getContentLength() > 0
-						&& entity.getContentType().getValue().equalsIgnoreCase("application/json")) {
-					InputStreamReader reader = new InputStreamReader(entity.getContent());
-					try {
-						msg = json.readValue(reader, Error.class).msg;
-					} catch (JsonParseException e) {
-						msg = "IronCache's response contained invalid JSON";
-					} finally {
-						if (reader != null) {
-							reader.close();
-						}
+
+		if (statusCode == 200) {
+			return new InputStreamReader(entity.getContent(), encoding);
+		} else {
+			String msg = "Empty or non-JSON response";
+
+			if (null != entity
+					&& entity.getContentLength() > 0
+					&& entity.getContentType().getValue()
+							.equalsIgnoreCase("application/json")) {
+				InputStreamReader reader = new InputStreamReader(
+						entity.getContent(), encoding);
+				try {
+					msg = json.readValue(reader, CacheError.class).getMessage();
+				} catch (JsonParseException e) {
+					msg = "IronCache's response contained invalid JSON";
+				} finally {
+					if (reader != null) {
+						reader.close();
 					}
-					throw new HTTPException(statusCode, msg);
-				} else {
-					msg = "Empty or non-JSON response";
 				}
 			}
-		} else {
-			return new InputStreamReader(entity.getContent());
+			throw new HTTPException(statusCode, msg);
 		}
-		return null;
 	}
 
 }
