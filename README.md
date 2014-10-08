@@ -1,3 +1,5 @@
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.mrcritical/ironcache/badge.png)](https://maven-badges.herokuapp.com/maven-central/com.github.mrcritical/ironcache)
+
 Iron.io IronCache
 =========
 
