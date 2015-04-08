@@ -22,6 +22,7 @@ import com.github.mrcritical.ironcache.internal.http.ResponseInitializer;
 import com.github.mrcritical.ironcache.internal.model.CacheRequest;
 import com.github.mrcritical.ironcache.internal.model.CacheResponse;
 import com.github.mrcritical.ironcache.internal.model.Increment;
+import com.github.mrcritical.ironcache.internal.model.IncrementCacheResponse;
 import com.github.mrcritical.ironcache.internal.model.requests.CacheItemUrl;
 import com.github.mrcritical.ironcache.internal.model.requests.CacheUrl;
 import com.github.mrcritical.ironcache.internal.model.requests.CachesUrl;
@@ -41,6 +42,7 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.Strings;
 import com.google.api.client.util.Throwables;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 
@@ -279,13 +281,18 @@ public class DefaultIronCacheProvider implements IronCacheProvider {
 	public void incrementItem(final String name, final String key, final int amount) {
 		try {
 
-			final CacheResponse response = objectMapper.readValue(
+			final IncrementCacheResponse response = objectMapper.readValue(
 					requestFactory
 							.buildPostRequest(new IncrementCacheItemUrl(hostName, projectId, name, key),
 									new JsonHttpContent(JSON_FACTORY, new Increment().amount(amount))).execute()
-							.getContent(), CacheResponse.class);
+							.getContent(), IncrementCacheResponse.class);
 
-			validate(response, "added");
+			// Validate an increment, presence of a value is validation
+			if (null == response.getValue()) {
+				String message = MoreObjects.firstNonNull(
+						response.getMessage(), "Increment value returned NULL");
+				throw new IllegalArgumentException(message);
+			}
 
 		} catch (final Exception e) {
 			throw Throwables.propagate(e);
