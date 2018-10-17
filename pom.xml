@@ -36,7 +36,7 @@
 		<guava.version>18.0</guava.version>
 		<jodatime.version>2.4</jodatime.version>
 		<jackson.version>[2.6.7.1,)</jackson.version>
-		<httpclient.version>4.3.5</httpclient.version>
+		<httpclient.version>[4.3.6,)</httpclient.version>
 		<junit.version>4.11</junit.version>
 		<mockito.version>1.9.5</mockito.version>
 		<lombok.version>1.14.8</lombok.version>
